@@ -8,18 +8,7 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\PhotoController;
 
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
+// PRAKTIKUM 1
 Route::get('/', function () {
     return view('welcome');
 });
@@ -60,36 +49,37 @@ Route::get('/user/{name?}', function ($name = 'John') {
     return 'Nama saya ' . $name;
 });
 
-//route name
-// Route::get('/user/profile', function () {
-//         // 
-//     })->name('profile.basic');
-//     Route::get(
-//         '/user/profile',
-//         [UserProfileController::class, 'show']
-//     )->name('profile');
-//     // Generating URLs... 
-//     $url = route('profile');
-//     // Generating Redirects... 
-//     return redirect()->route('profile');
 
-Route::get('/hello', [WelcomeController::class,'hello']);
+//PRAKTIKUM 2  
+Route::get('/hello', [WelcomeController::class, 'hello']);
 
-Route::get('/', [PageController::class,'index']);
-Route::get('/about', [PageController::class,'about']);
-Route::get('/articles', [PageController::class,'articles']);
-Route::get('/article/{id}', [PageController::class,'article']);
+Route::get('/', [PageController::class, 'index']);
+Route::get('/about', [PageController::class, 'about']);
+Route::get('/articles', [PageController::class, 'articles']);
+Route::get('/article/{id}', [PageController::class, 'article']);
 
 Route::middleware('auth')->group(function () {
-    Route::get('/', HomeController::class, '__invoke' ); // Home route
+    Route::get('/', HomeController::class, '__invoke'); // Home route
     Route::get('/about', AboutController::class); // About route
     Route::get('/article/{id}', ArticleController::class)->name('article'); // Dynamic article route
 });
 
 Route::resource('photos', PhotoController::class);
 Route::resource('photos', PhotoController::class)->only([
-    'index', 'show'
-    ]);
-    Route::resource('photos', PhotoController::class)->except([
-    'create', 'store', 'update', 'destroy'
-    ]);
+    'index',
+    'show'
+]);
+Route::resource('photos', PhotoController::class)->except([
+    'create',
+    'store',
+    'update',
+    'destroy'
+]);
+
+// PRAKTIKUM 3 
+
+Route::get('/greeting', function () {
+    return view('blog.hello', ['name' => 'Adell']);
+});
+
+Route::get('/greeting', [WelcomeController::class,'greeting']);
