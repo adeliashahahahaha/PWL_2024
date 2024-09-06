@@ -3,7 +3,7 @@
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WelcomeController;
-use App\Http\Controllers\HomeController;
+// use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\PhotoController;
@@ -58,11 +58,11 @@ Route::get('/about', [PageController::class, 'about']);
 Route::get('/articles', [PageController::class, 'articles']);
 Route::get('/article/{id}', [PageController::class, 'article']);
 
-Route::middleware('auth')->group(function () {
-    Route::get('/', HomeController::class, '__invoke'); // Home route
-    Route::get('/about', AboutController::class); // About route
-    Route::get('/article/{id}', ArticleController::class)->name('article'); // Dynamic article route
-});
+// Route::middleware('auth')->group(function () {
+//     Route::get('/', HomeController::class, '__invoke'); // Home route
+//     Route::get('/about', AboutController::class); // About route
+//     Route::get('/article/{id}', ArticleController::class)->name('article'); // Dynamic article route
+// });
 
 Route::resource('photos', PhotoController::class);
 Route::resource('photos', PhotoController::class)->only([
