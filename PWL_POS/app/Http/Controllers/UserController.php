@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -8,7 +9,8 @@ use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         //tambah data user ke m_user
         // $data = [
         //     'username' => 'customer-1',
@@ -19,12 +21,28 @@ class UserController extends Controller
         // UserModel::insert($data);
 
         //tambah data user dengan Eloquent Model
+        // $data = [
+        //     'nama' => 'Pelanggan Pertama'
+        // ];
+        // UserModel::where('username', 'customer-1') ->update ($data);
+
+        // $data = [
+        //     'level_id' => 2,
+        //     'username' => 'manager_dua',
+        //     'nama' => 'Manager2',
+        //     'password' => Hash::make('12345')
+        // ];
+        // UserModel::create($data);
+
         $data = [
-            'nama' => 'Pelanggan Pertama'
+            'level_id' => 2,
+            'username' => 'manager_tiga',
+            'nama' => 'Manager3',
+            'password' => Hash::make('12345')
         ];
-        UserModel::where('username', 'customer-1') ->update ($data);
+        UserModel:: create($data);
 
         $user = UserModel::all();
-        return view ('user', ['data' => $user]);
+        return view('user', ['data' => $user]);
     }
 }
