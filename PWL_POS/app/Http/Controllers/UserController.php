@@ -45,7 +45,7 @@ class UserController extends Controller
         // $user = UserModel::all();
         // return view('user', ['data' => $user]);
 
-        // -------- [JS4] praktikum 2.1 ----------
+    // -------- [JS4] praktikum 2.1 ----------
         // $user = UserModel::find(1);
         // return view('user', ['data' => $user]);
         //------------------------------------------
@@ -60,14 +60,14 @@ class UserController extends Controller
         // });
         // return view('user', ['data' => $user]);
 
-        // -------- [JS4] praktikum 2.2 ----------
+    // -------- [JS4] praktikum 2.2 ----------
         // $user = UserModel::findOrFail(1);
         // return view('user', ['data' => $user]);
         //------------------------------------------
         // $user = UserModel::where('username', 'manager9')->firstOrFail();
         // return view('user', ['data' => $user]);
 
-        // -------- [JS4] praktikum 2.3 ----------
+    // -------- [JS4] praktikum 2.3 ----------
         // $user = UserModel::where('level_id', 2)-> count();
         // dd($user);
         // return view('user', ['data' => $user]);
@@ -75,7 +75,7 @@ class UserController extends Controller
         // $userCount = UserModel::where('level_id', 2)->count();
         // return view('user', ['data' => $userCount]);
 
-        // -------- [JS4] praktikum 2.4 ----------
+    // -------- [JS4] praktikum 2.4 ----------
         // $user=UserModel::firstOrCreate(
         // [
         //     'username' =>'manager',
@@ -111,7 +111,7 @@ class UserController extends Controller
 
         // return view('user', ['data' => $user]);  
 
-        // -------- [JS4] praktikum 2.5 ----------
+    // -------- [JS4] praktikum 2.5 ----------
         // $user=UserModel::create(
         //     [
         //         'username' =>'manager55',
@@ -154,10 +154,20 @@ class UserController extends Controller
         // $user -> wasChanged('nama'); //false
         // $user -> wasChanged(['nama', 'username']); //true
 
-        // -------- [JS4] praktikum 2.6 ----------
+    // -------- [JS4] praktikum 2.6 ----------
         $user = UserModel::all();
         return view('user', ['data' => $user]);
+   
+    // -------- [JS4] praktikum 2.7 ----------
+        // $user = UserModel::with ('level')->get();
+        // dd($user);
+        //------------------------------------------
+        $user=UserModel::with('level')->get();
+        return view('user', ['data' => $user]);
+
     }
+    
+    // -------- [JS4] praktikum 2.6 ----------
 
     public function tambah()
     {
