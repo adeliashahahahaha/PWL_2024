@@ -15,10 +15,11 @@ class UserModel extends Model
     protected $table = 'm_user';
     protected $primaryKey = 'user_id';
     protected $fillable = ['level_id', 'username', 'nama', 'password'];
-    // protected $fillable = ['level_id', 'username', 'nama'];
 
     public function level(): BelongsTo
     {
-        return $this->belongsTo(LevelModel::class, 'level_id', 'level_id');
+        return $this->belongsTo(levelModel::class, 'level_id', 'level_id');
     }
+
+
 }

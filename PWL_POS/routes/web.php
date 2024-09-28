@@ -33,6 +33,20 @@ Route::put('/ubah_simpan/{id}', [UserController::class, 'ubah_simpan'])->name('u
 
 Route::get('/user/hapus/{id}', [UserController::class, 'hapus']);
 
+// --------- JS 5 - PRAKTIKUM 3 ---------
 Route::get('/', [WelcomeController::class, 'index']);
+
+Route::group(['prefix' => 'user'], function (){
+    Route::get('/', [UserController::class, 'index']);              // tampil halaman awal
+    Route::post('/list', [UserController::class, 'list'])->name('user.list');          // tampil list data user
+    Route::get('/create', [UserController::class, 'create']);       // create user baru
+    Route::post('/', [UserController::class, 'store']);             // simpan data user baru
+    Route::get('/{id}', [UserController::class, 'show']);           // lihat detail user
+    Route::get('/{id}/edit', [UserController::class, 'edit']);      // edit user
+    Route::put('/{id}', [UserController::class, 'update']);         // simpan update data
+    Route::delete('/{id}', [UserController::class, 'destroy']);     // hapus data user
+
+});
+
 
 
