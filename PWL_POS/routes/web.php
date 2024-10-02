@@ -43,11 +43,13 @@ Route::group(['prefix' => 'user'], function (){
     Route::post('/list', [UserController::class, 'list'])->name('user.list');          // tampil list data user
     Route::get('/create', [UserController::class, 'create']);       // create user baru
     Route::post('/', [UserController::class, 'store']);             // simpan data user baru
-    Route::get('/create_ajax', [UserController::class, 'create_ajax']);      
+    Route::get('/create_ajax', [UserController::class, 'create_ajax']);
     Route::post('/ajax', [UserController::class, 'store_ajax']);
     Route::get('/{id}', [UserController::class, 'show']);           // lihat detail user
     Route::get('/{id}/edit', [UserController::class, 'edit']);      // edit user
     Route::put('/{id}', [UserController::class, 'update']);         // simpan update data
+    Route::get('/{id}/edit_ajax', [UserController::class, 'edit_ajax']);      // AJAX edit user
+    Route::put('/{id}/update_ajax', [UserController::class, 'update_ajax']);         // AJAX simpan update data
     Route::delete('/{id}', [UserController::class, 'destroy']);     // hapus data user
 
 });
