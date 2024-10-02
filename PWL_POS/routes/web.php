@@ -50,6 +50,8 @@ Route::group(['prefix' => 'user'], function (){
     Route::put('/{id}', [UserController::class, 'update']);         // simpan update data
     Route::get('/{id}/edit_ajax', [UserController::class, 'edit_ajax']);      // AJAX edit user
     Route::put('/{id}/update_ajax', [UserController::class, 'update_ajax']);         // AJAX simpan update data
+    Route::get('/{id}/delete_ajax', [UserController::class, 'confirm_ajax']);      // AJAX form confirm
+    Route::delete('/{id}/delete_ajax', [UserController::class, 'delete_ajax']);     // AJAX hapus data user
     Route::delete('/{id}', [UserController::class, 'destroy']);     // hapus data user
 
 });
