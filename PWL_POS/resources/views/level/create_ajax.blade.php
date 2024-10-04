@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Batal</button>
                 <button type="submit" class="btn btn-primary">Simpan</button>
             </div>
         </div>
@@ -42,17 +42,17 @@
                     data: $(form).serialize(),
                     success: function(response) {
                         if (response.status) {
-                            $('#myModal').modal('hide');
+                            $('#myModal').modal('hide'); // Tutup modal setelah berhasil
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Berhasil',
                                 text: response.message
                             });
-                            dataLevel.ajax.reload();
+                            $('#table_level').DataTable().ajax.reload(); // Reload DataTables
                         } else {
-                            $('.error-text').text('');
+                            $('.error-text').text(''); // Kosongkan error sebelumnya
                             $.each(response.msgField, function(prefix, val) {
-                                $('#error-' + prefix).text(val[0]);
+                                $('#error-' + prefix).text(val[0]); // Tampilkan error
                             });
                             Swal.fire({
                                 icon: 'error',
@@ -60,9 +60,17 @@
                                 text: response.message
                             });
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.'
+                        });
                     }
                 });
-                return false;
+                return false; // Mencegah form submit normal
             },
             errorElement: 'span',
             errorPlacement: function(error, element) {

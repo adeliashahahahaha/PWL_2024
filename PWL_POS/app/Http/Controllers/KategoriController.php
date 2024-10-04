@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\KategoriModel;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
 class KategoriController extends Controller
@@ -187,4 +188,142 @@ class KategoriController extends Controller
             return redirect('/kategori')->with('error', 'Data kategori gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini');
         }
     }
+
+    //-------------------------------- AJAX -----------------------------------------------------------------------
+
+    // Menampilkan form tambah kategori via AJAX
+    public function create_ajax()
+    {
+        return view('kategori.create_ajax'); // Pastikan file ini ada di folder views/kategori
+    }
+
+    // Menyimpan data kategori menggunakan AJAX
+    public function store_ajax(Request $request) {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'kategori_kode' => 'required|string|min:3|unique:m_kategori,kategori_kode',
+                'kategori_nama' => 'required|string|max:100',
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors(),
+                ]);
+            }
+
+            KategoriModel::create([
+                'kategori_kode' => $request->kategori_kode,
+                'kategori_nama' => $request->kategori_nama
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data kategori berhasil disimpan',
+            ]);
+        }
+
+        return redirect('/');
+    }
+
+    // Menampilkan halaman form edit kategori ajax
+    public function edit_ajax(string $id)
+    {
+        $kategori = KategoriModel::find($id);
+
+        if (!$kategori) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data kategori tidak ditemukan',
+            ]);
+        }
+
+        return view('kategori.edit_ajax', ['kategori' => $kategori]); // Pastikan file ini ada di views/kategori
+    }
+
+    // Memperbarui data kategori via AJAX
+    public function update_ajax(Request $request, $id) {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'kategori_kode' => 'required|string|min:3|unique:m_kategori,kategori_kode,' . $id . ',kategori_id',
+                'kategori_nama' => 'required|string|max:100',
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi gagal.',
+                    'msgField' => $validator->errors(),
+                ]);
+            }
+
+            $check = KategoriModel::find($id);
+            if ($check) {
+                $check->update([
+                    'kategori_kode' => $request->kategori_kode,
+                    'kategori_nama' => $request->kategori_nama
+                ]);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data kategori berhasil diupdate'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
+        }
+
+        return redirect('/');
+    }
+
+    // Menampilkan halaman konfirmasi hapus kategori via AJAX
+    public function confirm_ajax(string $id)
+    {
+        $kategori = KategoriModel::find($id);
+
+        if (!$kategori) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data kategori tidak ditemukan.'
+            ]);
+        }
+
+        return view('kategori.confirm_ajax', ['kategori' => $kategori]); // Pastikan file ini ada di views/kategori
+    }
+
+    // Menghapus data kategori menggunakan AJAX
+
+    public function delete_ajax(Request $request, $id)
+{
+    // Cek apakah request berasal dari AJAX
+    if ($request->ajax() || $request->wantsJson()) {
+        // Temukan kategori berdasarkan ID
+        $kategori = KategoriModel::find($id);
+
+        if ($kategori) {
+            // Hapus kategori
+            $kategori->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'Data kategori berhasil dihapus',
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan',
+            ]);
+        }
+    }
+
+    return redirect('/'); // Jika bukan request AJAX, arahkan kembali ke halaman utama
+}
+
 }

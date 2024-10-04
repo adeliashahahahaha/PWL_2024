@@ -233,13 +233,20 @@ class LevelController extends Controller
         return redirect('/'); // Jika bukan request AJAX, arahkan kembali ke halaman utama
     }
 
-    // Menampilkan halaman form edit level ajax
-    public function edit_ajax(string $id)
+    public function edit_ajax($id)
     {
         $level = levelModel::find($id);
 
-        return view('level.edit_ajax', ['level' => $level]);
+        if (!$level) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan.'
+            ]);
+        }
+
+        return view('level.edit_ajax', compact('level'));
     }
+
 
     // Memperbarui data level menggunakan AJAX
     public function update_ajax(Request $request, $id)
@@ -320,7 +327,8 @@ class LevelController extends Controller
             }
         }
 
-        return redirect('/'); // Jika bukan request AJAX, arahkan kembali ke halaman utama
+        return redirect('/');
     }
+
 }
 
