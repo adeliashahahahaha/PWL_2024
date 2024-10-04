@@ -10,7 +10,7 @@
         <div class="modal-body">
             <div class="alert alert-danger">
                 <h5><i class="icon fas fa-ban"></i> Kesalahan!!!</h5>
-                Data yang Anda cari tidak ditemukan.
+                Data yang anda cari tidak ditemukan
             </div>
         </div>
     </div>
@@ -30,27 +30,23 @@
             <div class="modal-body">
                 <div class="alert alert-warning">
                     <h5><i class="icon fas fa-ban"></i> Konfirmasi !!!</h5>
-                    Apakah Anda yakin ingin menghapus data barang ini?
+                    Apakah Anda ingin menghapus data seperti di bawah ini?
                 </div>
                 <table class="table table-sm table-bordered table-striped">
                     <tr>
-                        <th class="text-right col-3">Kode Barang:</th>
+                        <th class="text-right col-3">Kode Barang :</th>
                         <td class="col-9">{{ $barang->barang_kode }}</td>
                     </tr>
                     <tr>
-                        <th class="text-right col-3">Nama Barang:</th>
+                        <th class="text-right col-3">Nama Barang :</th>
                         <td class="col-9">{{ $barang->barang_nama }}</td>
                     </tr>
                     <tr>
-                        <th class="text-right col-3">Kategori:</th>
-                        <td class="col-9">{{ $barang->kategori->kategori_nama }}</td>
-                    </tr>
-                    <tr>
-                        <th class="text-right col-3">Harga Beli:</th>
+                        <th class="text-right col-3">Harga Beli :</th>
                         <td class="col-9">{{ $barang->harga_beli }}</td>
                     </tr>
                     <tr>
-                        <th class="text-right col-3">Harga Jual:</th>
+                        <th class="text-right col-3">Harga Jual :</th>
                         <td class="col-9">{{ $barang->harga_jual }}</td>
                     </tr>
                 </table>
@@ -66,7 +62,6 @@
 <script>
 $(document).ready(function() {
     $("#form-delete").validate({
-        rules: {},
         submitHandler: function(form) {
             $.ajax({
                 url: form.action,
@@ -80,17 +75,28 @@ $(document).ready(function() {
                             title: 'Berhasil',
                             text: response.message
                         });
-                        $('#table_barang').DataTable().ajax.reload(); // Reload tabel data barang
+                        dataBarang.ajax.reload();
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Kesalahan',
+                            title: 'Terjadi Kesalahan',
                             text: response.message
                         });
                     }
                 }
             });
             return false;
+        },
+        errorElement: 'span',
+        errorPlacement: function(error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function(element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
         }
     });
 });

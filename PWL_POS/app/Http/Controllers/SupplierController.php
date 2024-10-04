@@ -180,4 +180,133 @@ class SupplierController extends Controller
             return redirect('/supplier')->with('error', 'Data supplier gagal dihapus karena terkait dengan data lain');
         }
     }
+
+    //--------------------------- AJAX ------------------------------------------------
+
+    // Menampilkan halaman form tambah supplier ajax
+    public function create_ajax()
+    {
+        return view('supplier.create_ajax');
+    }
+
+    // Menyimpan data supplier menggunakan AJAX
+    public function store_ajax(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'supplier_kode' => 'required|string|min:3|unique:m_supplier,supplier_kode',
+                'supplier_nama' => 'required|string|max:100',
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors(),
+                ]);
+            }
+
+            SupplierModel::create($request->all());
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data supplier berhasil disimpan',
+            ]);
+        }
+
+        return redirect('/');
+    }
+
+    // Menampilkan halaman form edit supplier ajax
+    public function edit_ajax($id)
+    {
+        $supplier = SupplierModel::find($id);
+
+        if (!$supplier) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan.'
+            ]);
+        }
+
+        return view('supplier.edit_ajax', ['supplier' => $supplier]);
+    }
+
+    // Memperbarui data supplier menggunakan AJAX
+    public function update_ajax(Request $request, $id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'supplier_kode' => 'required|string|min:3|unique:m_supplier,supplier_kode,' . $id . ',supplier_id',
+                'supplier_nama' => 'required|string|max:100',
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi gagal.',
+                    'msgField' => $validator->errors(),
+                ]);
+            }
+
+            $supplier = SupplierModel::find($id);
+            if ($supplier) {
+                $supplier->update($request->all());
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diupdate'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
+        }
+
+        return redirect('/');
+    }
+
+    // Menampilkan konfirmasi hapus supplier ajax
+    public function confirm_ajax($id)
+    {
+        $supplier = SupplierModel::find($id);
+
+        if (!$supplier) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Supplier tidak ditemukan.'
+            ]);
+        }
+
+        return view('supplier.confirm_ajax', ['supplier' => $supplier]);
+    }
+
+    // Menghapus data supplier menggunakan AJAX
+    public function delete_ajax(Request $request, $id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $supplier = SupplierModel::find($id);
+
+            if ($supplier) {
+                $supplier->delete();
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil dihapus',
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ]);
+            }
+        }
+
+        return redirect('/');
+    }
 }
+
