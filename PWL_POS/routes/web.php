@@ -8,7 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\RegistrationController;
 
 //JS 7 PRAKTIKUM 1
 Route::pattern('id', '[0-9]+'); //artinya ketika ada parameter {id}, maka harus berupa angka
@@ -16,6 +16,9 @@ Route::pattern('id', '[0-9]+'); //artinya ketika ada parameter {id}, maka harus 
 Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::post('login', [AuthController::class, 'postlogin']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
+
+Route::get('signup', [RegistrationController::class, 'registration'])->name('signup');
+Route::post('signup', [RegistrationController::class, 'store']);
 
 Route::middleware(['auth'])->group(function() { // semua route di dalam group harus login dulu
     // masukkan semua route yang perlu autentikasi di sini

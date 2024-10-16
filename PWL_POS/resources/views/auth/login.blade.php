@@ -61,6 +61,8 @@
                             <button type="submit" class="btn btn-primary btn-block">Sign In</button>
                         </div>
                     </div>
+                    <br>
+                    <p>Don't have an account? <a href="{{ url('signup') }}">Sign up</a></p>
                 </form>
             </div>
         </div>
