@@ -118,9 +118,6 @@ Route::middleware(['auth'])->group(function() { // semua route di dalam group ha
 
 // });
 
-// JS 7 | Tugas 1
-
-
 // JS 7 | Tugas 3
 //Semua route di grup ini harus punya role ADM (Administrator)
 Route::group(['prefix' => 'user', 'middleware'=> 'authorize:ADM'], function(){
