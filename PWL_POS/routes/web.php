@@ -188,6 +188,8 @@ Route::group(['prefix' => 'barang', 'middleware'=> 'authorize:ADM,MNG'], functio
     Route::delete('/{id}/delete_ajax', [BarangController::class, 'delete_ajax']);       //menghapus data barang AJAX
     Route::get('/import', [BarangController::class, 'import'])->name ('barang.import.form');                         //ajax form upload excel
     Route::post('/import_ajax', [BarangController::class, 'import_ajax'])->name('barang.import');
+    Route::get('/export_excel', [BarangController::class, 'export_excel']);              //ajax export excel
+    Route::get('/export_pdf', [BarangController::class, 'export_pdf']);              //ajax export excel
 });
 });
 
