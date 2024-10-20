@@ -7,9 +7,12 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StokController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegistrationController;
+
+
 
 //JS 7 PRAKTIKUM 1
 Route::pattern('id', '[0-9]+'); //artinya ketika ada parameter {id}, maka harus berupa angka
@@ -35,8 +38,9 @@ Route::middleware(['auth'])->group(function () { // semua route di dalam group h
 
     // Rute untuk memperbarui password
     Route::put('/profile/password/update', [ProfileController::class, 'updatePassword'])->name('password.update');
-    Route::get('/', [WelcomeController::class, 'index']);
 
+
+    Route::get('/', [WelcomeController::class, 'index']);
 
     // JS 7 | Tugas 3
     //Semua route di grup ini harus punya role ADM (Administrator)
@@ -110,6 +114,21 @@ Route::middleware(['auth'])->group(function () { // semua route di dalam group h
         Route::post('/import_ajax', [BarangController::class, 'import_ajax'])->name('barang.import');
         Route::get('/export_excel', [BarangController::class, 'export_excel']);              //ajax export excel
         Route::get('/export_pdf', [BarangController::class, 'export_pdf']);              //ajax export excel
+    });
+
+    Route::middleware(['authorize:ADM,MNG,STF'])->group(function () {
+        Route::get('/stok', [StokController::class, 'index']);
+        Route::post('/stok/list', [StokController::class, 'list']);
+        Route::get('/stok/create_ajax', [StokController::class, 'create_ajax']);
+        Route::post('/stok/store_ajax', [StokController::class, 'store_ajax']);
+        Route::get('/stok/{id}/show_ajax', [StokController::class, 'show_ajax']);
+        Route::get('/stok/{id}/edit_ajax', [StokController::class, 'edit_ajax']);
+        Route::put('/stok/{id}/update_ajax', [StokController::class, 'update_ajax']);
+        Route::get('/stok/{id}/delete_ajax', [StokController::class, 'confirm_ajax']);
+        Route::delete('/stok/{id}/delete_ajax', [StokController::class, 'delete_ajax']);
+        Route::post('/stok/import_ajax', [StokController::class, 'import_ajax']);
+        Route::get('/stok/export_excel', [StokController::class, 'export_excel']);
+        Route::get('/stok/export_pdf', [StokController::class, 'export_pdf']);
     });
 });
 
