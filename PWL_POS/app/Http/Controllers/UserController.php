@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\levelModel;
 use Illuminate\Support\Facades\Validator;
-
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class UserController extends Controller
 {
@@ -534,4 +535,83 @@ class UserController extends Controller
         return redirect('/');
     }
 
+    public function export_excel()
+    {
+        // Ambil data user yang akan diekspor
+        $users = UserModel::select('username', 'nama', 'level_id', 'created_at', 'updated_at')
+            ->orderBy('level_id')
+            ->get();
+
+        // Load library Excel
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set header untuk kolom
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Username');
+        $sheet->setCellValue('C1', 'Nama');
+        $sheet->setCellValue('D1', 'Level');
+        $sheet->setCellValue('E1', 'Dibuat Pada');
+        $sheet->setCellValue('F1', 'Diperbarui Pada');
+
+        // Set header menjadi bold
+        $sheet->getStyle('A1:F1')->getFont()->setBold(true);
+
+        $no = 1; // Nomor data dimulai dari 1
+        $baris = 2; // Baris data dimulai dari baris ke-2
+
+        foreach ($users as $key => $user) {
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $user->username);
+            $sheet->setCellValue('C' . $baris, $user->nama);
+            $sheet->setCellValue('D' . $baris, $user->level_id);
+            $sheet->setCellValue('E' . $baris, $user->created_at);
+            $sheet->setCellValue('F' . $baris, $user->updated_at);
+
+            $baris++; // Pindah ke baris berikutnya
+            $no++;    // Tambahkan nomor urut
+        }
+
+        foreach (range('A', 'F') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true); // Set auto size untuk kolom
+        }
+
+        $sheet->setTitle('Data User'); // Set judul sheet
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data User ' . date('Y-m-d H:i:s') . '.xlsx';
+
+        // Set header untuk file Excel
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+        // Simpan dan kirim output
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function export_pdf()
+    {
+        // Ambil data user yang akan diekspor
+        $users = UserModel::select('username', 'nama', 'level_id', 'created_at', 'updated_at')
+            ->orderBy('level_id')
+            ->get();
+
+        // Load view untuk PDF
+        $pdf = Pdf::loadView('user.export_pdf', ['users' => $users]);
+
+        // Set ukuran kertas dan orientasi (A4, portrait)
+        $pdf->setPaper('a4', 'portrait');
+
+        // Jika ada gambar dari URL, set isRemoteEnabled ke true
+        $pdf->setOption("isRemoteEnabled", true);
+
+        // Render dan stream PDF
+        return $pdf->stream('Data User ' . date('Y-m-d H:i:s') . '.pdf');
+    }
 }

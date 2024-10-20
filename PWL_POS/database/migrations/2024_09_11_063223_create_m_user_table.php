@@ -4,32 +4,31 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class AddAvatarToMUserTable extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('m_user', function (Blueprint $table) {
-            $table->id('user_id');
-            $table->unsignedBigInteger('level_id')-> index();
-            $table->string('username', 20) -> unique();
-            $table->string('nama', 100);
-            $table->string('password', 100);
-            $table->timestamps();
-
-            $table->foreign('level_id')->references('level_id')->on('m_level');
+        Schema::table('m_user', function (Blueprint $table) {
+            // Menambahkan kolom 'avatar' bertipe string dan nullable
+            $table->string('avatar')->nullable()->after('username'); // Adjust sesuai dengan urutan yang diinginkan
         });
     }
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
         Schema::table('m_user', function (Blueprint $table) {
-            //
+            // Menghapus kolom 'avatar' jika rollback
+            $table->dropColumn('avatar');
         });
     }
-};
+}
