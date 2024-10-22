@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\levelModel;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 // class LevelController extends Controller
@@ -329,6 +330,27 @@ class LevelController extends Controller
 
         return redirect('/');
     }
+
+    public function export_pdf()
+{
+    // Ambil data level
+    $levels = levelModel::select('level_id', 'level_kode', 'level_nama', 'created_at', 'updated_at')
+        ->orderBy('level_id')
+        ->get();
+
+    // Load view untuk PDF, gunakan Barryvdh\DomPDF\Facade\Pdf
+    $pdf = Pdf::loadView('level.export_pdf', ['levels' => $levels]);
+
+    // Set ukuran kertas dan orientasi (A4, portrait)
+    $pdf->setPaper('a4', 'portrait');
+
+    // Jika ada gambar dari URL, set isRemoteEnabled ke true
+    $pdf->setOption("isRemoteEnabled", true);
+
+    // Render dan stream PDF
+    return $pdf->stream('Data Level ' . date('Y-m-d H:i:s') . '.pdf');
+}
+
 
 }
 

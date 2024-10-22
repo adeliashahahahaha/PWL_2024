@@ -7,6 +7,7 @@ use App\Models\KategoriModel;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class KategoriController extends Controller
 {
@@ -198,7 +199,8 @@ class KategoriController extends Controller
     }
 
     // Menyimpan data kategori menggunakan AJAX
-    public function store_ajax(Request $request) {
+    public function store_ajax(Request $request)
+    {
         if ($request->ajax() || $request->wantsJson()) {
             $rules = [
                 'kategori_kode' => 'required|string|min:3|unique:m_kategori,kategori_kode',
@@ -245,7 +247,8 @@ class KategoriController extends Controller
     }
 
     // Memperbarui data kategori via AJAX
-    public function update_ajax(Request $request, $id) {
+    public function update_ajax(Request $request, $id)
+    {
         if ($request->ajax() || $request->wantsJson()) {
             $rules = [
                 'kategori_kode' => 'required|string|min:3|unique:m_kategori,kategori_kode,' . $id . ',kategori_id',
@@ -302,28 +305,46 @@ class KategoriController extends Controller
     // Menghapus data kategori menggunakan AJAX
 
     public function delete_ajax(Request $request, $id)
-{
-    // Cek apakah request berasal dari AJAX
-    if ($request->ajax() || $request->wantsJson()) {
-        // Temukan kategori berdasarkan ID
-        $kategori = KategoriModel::find($id);
+    {
+        // Cek apakah request berasal dari AJAX
+        if ($request->ajax() || $request->wantsJson()) {
+            // Temukan kategori berdasarkan ID
+            $kategori = KategoriModel::find($id);
 
-        if ($kategori) {
-            // Hapus kategori
-            $kategori->delete();
-            return response()->json([
-                'status' => true,
-                'message' => 'Data kategori berhasil dihapus',
-            ]);
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data tidak ditemukan',
-            ]);
+            if ($kategori) {
+                // Hapus kategori
+                $kategori->delete();
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data kategori berhasil dihapus',
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ]);
+            }
         }
+
+        return redirect('/'); // Jika bukan request AJAX, arahkan kembali ke halaman utama
     }
+    public function export_pdf()
+    {
+        // Ambil data kategori
+        $kategoris = KategoriModel::select('kategori_id', 'kategori_kode', 'kategori_nama', 'created_at', 'updated_at')
+            ->orderBy('kategori_id')
+            ->get();
 
-    return redirect('/'); // Jika bukan request AJAX, arahkan kembali ke halaman utama
-}
+        // Load view untuk PDF, gunakan Barryvdh\DomPDF\Facade\Pdf
+        $pdf = Pdf::loadView('kategori.export_pdf', ['kategoris' => $kategoris]);
 
+        // Set ukuran kertas dan orientasi (A4, portrait)
+        $pdf->setPaper('a4', 'portrait');
+
+        // Jika ada gambar dari URL, set isRemoteEnabled ke true
+        $pdf->setOption("isRemoteEnabled", true);
+
+        // Render dan stream PDF
+        return $pdf->stream('Data Kategori ' . date('Y-m-d H:i:s') . '.pdf');
+    }
 }

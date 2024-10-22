@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\SupplierModel;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SupplierController extends Controller
 {
@@ -308,5 +309,26 @@ class SupplierController extends Controller
 
         return redirect('/');
     }
+
+    public function export_pdf()
+    {
+        // Ambil data supplier
+        $suppliers = SupplierModel::select('supplier_id', 'supplier_kode', 'supplier_nama', 'created_at', 'updated_at')
+            ->orderBy('supplier_id')
+            ->get();
+
+        // Load view untuk PDF, gunakan Barryvdh\DomPDF\Facade\Pdf
+        $pdf = Pdf::loadView('supplier.export_pdf', ['suppliers' => $suppliers]);
+
+        // Set ukuran kertas dan orientasi (A4, portrait)
+        $pdf->setPaper('a4', 'portrait');
+
+        // Jika ada gambar dari URL, set isRemoteEnabled ke true
+        $pdf->setOption("isRemoteEnabled", true);
+
+        // Render dan stream PDF
+        return $pdf->stream('Data Supplier ' . date('Y-m-d H:i:s') . '.pdf');
+    }
+
 }
 
