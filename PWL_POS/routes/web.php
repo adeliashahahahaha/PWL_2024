@@ -9,11 +9,14 @@ use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StokController;
 use App\Http\Controllers\PenjualanController;
+use App\Http\Controllers\LandingPageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RegistrationController;
 
+// TAMPILAN
 
+Route::get('/', [LandingPageController::class, 'index'])->name('home');
 
 //JS 7 PRAKTIKUM 1
 Route::pattern('id', '[0-9]+'); //artinya ketika ada parameter {id}, maka harus berupa angka
@@ -41,7 +44,7 @@ Route::middleware(['auth'])->group(function () { // semua route di dalam group h
     Route::put('/profile/password/update', [ProfileController::class, 'updatePassword'])->name('password.update');
 
 
-    Route::get('/', [WelcomeController::class, 'index']);
+    Route::get('/dashboard', [WelcomeController::class, 'index']);
 
     Route::middleware(['authorize:ADM,MNG,STF'])->group(function () {
         Route::get('/user', [UserController::class, 'index']);
