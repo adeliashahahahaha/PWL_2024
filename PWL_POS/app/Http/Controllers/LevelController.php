@@ -12,21 +12,21 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 // class LevelController extends Controller
 // {
-    // public function index(){
-    //     // DB::insert ('insert into m_level(level_kode,level_nama,created_at) values(?,?,?)',['cus','Pelanggan',now()]);
-    //     // return 'Insert data baru berhasil';
+// public function index(){
+//     // DB::insert ('insert into m_level(level_kode,level_nama,created_at) values(?,?,?)',['cus','Pelanggan',now()]);
+//     // return 'Insert data baru berhasil';
 
-    //     // $row = DB::update('update m_level set level_nama = ? where level_kode = ?', ['Customer','cus']);
-    //     // return 'Update data berhasil.Jumlah data yang diupdate: ' .$row.'baris';
+//     // $row = DB::update('update m_level set level_nama = ? where level_kode = ?', ['Customer','cus']);
+//     // return 'Update data berhasil.Jumlah data yang diupdate: ' .$row.'baris';
 
-    //     // $row = DB::delete('delete from m_level where level_kode = ?',['cus']);
-    //     // return 'Delete data berhasil. Jummlah data yang dihapus:  ' . $row. ' baris';
+//     // $row = DB::delete('delete from m_level where level_kode = ?',['cus']);
+//     // return 'Delete data berhasil. Jummlah data yang dihapus:  ' . $row. ' baris';
 
-    //     // $data = DB::select('select * from m_level');
-    //     // return view ('level',['data' => $data]);
+//     // $data = DB::select('select * from m_level');
+//     // return view ('level',['data' => $data]);
 
 
-    // }
+// }
 
 
 class LevelController extends Controller
@@ -52,24 +52,40 @@ class LevelController extends Controller
         ]);
     }
 
-    // Fetch level data for DataTables
     public function list(Request $request)
     {
-        $levels = levelModel::select('level_id', 'level_kode', 'level_nama');
+        $levels = levelModel::select('level_id', 'level_kode', 'level_nama', 'created_at', 'updated_at');
 
         return DataTables::of($levels)
             ->addIndexColumn()
             ->addColumn('aksi', function ($level) {
-                $btn = '<a href="' . url('/level/' . $level->level_id) . '" class="btn btn-info btn-sm">Detail</a> ';
-                $btn .= '<a href="' . url('/level/' . $level->level_id . '/edit') . '" class="btn btn-warning btn-sm">Edit</a> ';
-                $btn .= '<form class="d-inline-block" method="POST" action="' . url('/level/' . $level->level_id) . '">'
-                    . csrf_field() . method_field('DELETE') .
-                    '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';
-                return $btn;
+                return '
+                <button onclick="modalAction(\'' . url('level/' . $level->level_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button>
+                <button onclick="modalAction(\'' . url('level/' . $level->level_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button>
+                <form class="d-inline-block" method="POST" action="' . url('/level/' . $level->level_id) . '">
+                    ' . csrf_field() . method_field('DELETE') . '
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button>
+                </form>
+            ';
             })
             ->rawColumns(['aksi'])
             ->make(true);
     }
+
+    public function detail_ajax($id)
+    {
+        $level = levelModel::find($id);
+
+        if (!$level) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data level tidak ditemukan.'
+            ], 404);
+        }
+
+        return view('level.detail_ajax', compact('level')); // Pastikan nama view sesuai
+    }
+
 
     // Show the form to add a new level
     public function create()
@@ -132,6 +148,27 @@ class LevelController extends Controller
         ]);
     }
 
+    public function show_ajax($id)
+    {
+        // Mencari data level berdasarkan ID, beserta relasi yang diperlukan
+        $level = levelModel::with(['supplier', 'barang'])->find($id);
+        $page = (object)[
+            'title' => 'Detail Level' // Ubah judul untuk mencerminkan detail level
+        ];
+
+        // Memeriksa apakah level ditemukan
+        if (!$level) {
+            // Jika tidak ditemukan, kembalikan ke view dengan pesan kesalahan atau redirect sesuai kebutuhan
+            return response()->json([
+                'status' => false,
+                'message' => 'Data level tidak ditemukan.'
+            ], 404); // Mengembalikan 404 Not Found jika level tidak ada
+        }
+
+        // Mengembalikan view dengan data level dan page
+        return view('level.show_ajax', compact('level', 'page'));
+    }
+
     // Show the form to edit a level
     public function edit(string $id)
     {
@@ -189,7 +226,7 @@ class LevelController extends Controller
         }
     }
 
-//-------------------------------- AJAX -----------------------------------------------------------------------
+    //-------------------------------- AJAX -----------------------------------------------------------------------
 
     // Menampilkan halaman form tambah level ajax
     public function create_ajax()
@@ -332,25 +369,22 @@ class LevelController extends Controller
     }
 
     public function export_pdf()
-{
-    // Ambil data level
-    $levels = levelModel::select('level_id', 'level_kode', 'level_nama', 'created_at', 'updated_at')
-        ->orderBy('level_id')
-        ->get();
+    {
+        // Ambil data level
+        $levels = levelModel::select('level_id', 'level_kode', 'level_nama', 'created_at', 'updated_at')
+            ->orderBy('level_id')
+            ->get();
 
-    // Load view untuk PDF, gunakan Barryvdh\DomPDF\Facade\Pdf
-    $pdf = Pdf::loadView('level.export_pdf', ['levels' => $levels]);
+        // Load view untuk PDF, gunakan Barryvdh\DomPDF\Facade\Pdf
+        $pdf = Pdf::loadView('level.export_pdf', ['levels' => $levels]);
 
-    // Set ukuran kertas dan orientasi (A4, portrait)
-    $pdf->setPaper('a4', 'portrait');
+        // Set ukuran kertas dan orientasi (A4, portrait)
+        $pdf->setPaper('a4', 'portrait');
 
-    // Jika ada gambar dari URL, set isRemoteEnabled ke true
-    $pdf->setOption("isRemoteEnabled", true);
+        // Jika ada gambar dari URL, set isRemoteEnabled ke true
+        $pdf->setOption("isRemoteEnabled", true);
 
-    // Render dan stream PDF
-    return $pdf->stream('Data Level ' . date('Y-m-d H:i:s') . '.pdf');
+        // Render dan stream PDF
+        return $pdf->stream('Data Level ' . date('Y-m-d H:i:s') . '.pdf');
+    }
 }
-
-
-}
-

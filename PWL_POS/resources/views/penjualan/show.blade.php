@@ -1,77 +1,74 @@
-@extends('layouts.template')
+@extends('layouts.app')
 
 @section('content')
-<div class="card card-outline card-primary">
-    <div class="card-header">
-        <h3 class="card-title">Detail Penjualan</h3>
-        <div class="card-tools"></div>
-    </div>
-    <div class="card-body">
-        @empty($penjualan)
-        <div class="alert alert-danger alert-dismissible">
-            <h5><i class="icon fas fa-ban"></i> Kesalahan!</h5>
-            Data penjualan tidak ditemukan.
-        </div>
-        @else
-        <table class="table table-bordered table-striped table-hover table-sm">
+<div class="container">
+    <h2>Daftar Rekap Penjualan</h2>
+    <table class="table table-bordered table-striped table-hover table-sm">
+        <thead>
             <tr>
-                <th>ID Penjualan</th>
-                <td>{{ $penjualan->penjualan_id }}</td>
-            </tr>
-            <tr>
-                <th>User ID</th>
-                <td>{{ $penjualan->user_id }}</td> <!-- Assuming user_id is directly accessible -->
-            </tr>
-            <tr>
+                <th>ID</th>
+                <th>Nama User</th>
                 <th>Pembeli</th>
-                <td>{{ $penjualan->pembeli }}</td>
-            </tr>
-            <tr>
                 <th>Kode Penjualan</th>
-                <td>{{ $penjualan->penjualan_kode }}</td>
-            </tr>
-            <tr>
                 <th>Tanggal Penjualan</th>
-                <td>{{ \Carbon\Carbon::parse($penjualan->penjualan_tanggal)->format('d-m-Y') }}</td>
+                <th>Aksi</th>
             </tr>
+        </thead>
+        <tbody>
+            @foreach($penjualan as $data)
             <tr>
-                <th>Detail Penjualan</th>
+                <td>{{ $data->id }}</td>
+                <td>{{ $data->nama_user }}</td>
+                <td>{{ $data->pembeli }}</td>
+                <td>{{ $data->kode_penjualan }}</td>
+                <td>{{ $data->tanggal_penjualan->format('Y-m-d H:i:s') }}</td>
                 <td>
-                    <table class="table table-sm table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Jenis Barang</th>
-                                <th>Jumlah</th>
-                                <th>Harga Satuan</th>
-                                <th>Total Harga</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($penjualan->details as $detail)
-                            <tr>
-                                <td>{{ $detail->barang->jenis_barang }}</td> <!-- Adjust according to your model -->
-                                <td>{{ $detail->jumlah }}</td>
-                                <td>{{ number_format($detail->harga_jual, 2, ',', '.') }}</td> <!-- Adjust field name if necessary -->
-                                <td>{{ number_format($detail->total_harga, 2, ',', '.') }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <button type="button" class="btn btn-info btn-detail" data-id="{{ $data->id }}">Detail</button>
                 </td>
             </tr>
-            <tr>
-                <th>Total Keseluruhan</th>
-                <td>{{ number_format($penjualan->details->sum('total_harga'), 2, ',', '.') }}</td>
-            </tr>
-        </table>
-        @endempty
-        <a href="{{ url('penjualan') }}" class="btn btn-sm btn-default mt-2">Kembali</a>
+            @endforeach
+        </tbody>
+    </table>
+
+    <!-- Modal untuk Menampilkan Detail -->
+    <div id="modal-master" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Penjualan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Isi modal akan dimuat di sini oleh AJAX -->
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Event listener untuk tombol detail
+        $('.btn-detail').click(function() {
+            var penjualan_id = $(this).data('id'); // Dapatkan ID penjualan yang di klik
+
+            $.ajax({
+                url: '/penjualan/show/' + penjualan_id, // URL untuk request ke controller
+                type: 'GET',
+                success: function(data) {
+                    // Memuat data yang diterima ke dalam modal-body
+                    $('#modal-master .modal-body').html(data);
+
+                    // Tampilkan modal setelah data dimuat
+                    $('#modal-master').modal('show');
+                },
+                error: function() {
+                    alert('Gagal memuat data. Silakan coba lagi.');
+                }
+            });
+        });
+    });
+</script>
 @endsection
-
-@push('css')
-@endpush
-
-@push('js')
-@endpush

@@ -78,6 +78,7 @@ Route::middleware(['auth'])->group(function () { // semua route di dalam group h
         Route::post('/level/store_ajax', [LevelController::class, 'store_ajax']);
         Route::get('/level/{id}', [LevelController::class, 'show']);
         Route::get('/level/{id}/show_ajax', [LevelController::class, 'show_ajax']);
+        Route::get('/level/{id}/detail_ajax', [LevelController::class, 'detail_ajax']);
         Route::get('/level/{id}/edit', [LevelController::class, 'edit']);
         Route::put('/level/{id}', [LevelController::class, 'update']);
         Route::get('/level/{id}/edit_ajax', [LevelController::class, 'edit_ajax']);
