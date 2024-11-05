@@ -158,27 +158,6 @@ class PenjualanController extends Controller
         return view('penjualan.confirm_ajax', ['penjualan' => $penjualan]);
     }
 
-    // public function delete_ajax(Request $request, $id)
-    // {
-    //     // cek apakah request dari ajax
-    //     if ($request->ajax() || $request->wantsJson()) {
-    //         $penjualan = PenjualanModel::find($id);
-    //         if ($penjualan) {
-    //             $penjualan->delete();
-    //             return response()->json([
-    //                 'status' => true,
-    //                 'message' => 'Data berhasil dihapus'
-    //             ]);
-    //         } else {
-    //             return response()->json([
-    //                 'status' => false,
-    //                 'message' => 'Data tidak ditemukan'
-    //             ]);
-    //         }
-    //     }
-    //     return redirect('/');
-    // }
-
     public function delete_ajax(Request $request, string $id)
 {
     // Cek apakah request berasal dari AJAX
