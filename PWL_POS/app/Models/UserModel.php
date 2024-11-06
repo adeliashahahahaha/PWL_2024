@@ -2,42 +2,60 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Foundation\Auth\User as Authenticatable; //implementasi class Authenticatable
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class UserModel extends Authenticatable implements JWTSubject
 {
+    use HasFactory;
 
+    protected $table = 'm_user';
+    protected $primaryKey = 'user_id';
+
+    protected $fillable = [
+        'username',
+        'nama',
+        'password',
+        'level_id',
+        'image'
+    ];
+
+    protected $casts = ['password' => 'hashed'];
+
+    /**
+     * Implementasi JWT
+     */
     public function getJWTIdentifier()
     {
-        return $this-> getKey();
+        return $this->getKey();
     }
-    public function getJWTCustomClaims()
-    {
+
+    public function getJWTCustomClaims() {
         return [];
     }
 
-    use HasFactory;
-
-    protected $table = 'm_user'; //mendefinisikan nama table yang digunakan oleh model
-    protected $primaryKey = 'user_id'; //mendefinisikan primary key dari table yang digunakan
-
-    protected $fillable = ['username', 'password', 'nama', 'level_id', 'created_at', 'updated_at', 'avatar'];
-
-    protected $hidden = ['password']; //jangan di tampilka saat select
-
-    protected $casts = ['password' => 'hashed']; //casting password agar otomatis di hash
-
     /**
-     * Relasi ke tabel level
+     * Relasi ke tabel Level
      */
-    public function level(): BelongsTo {
+    public function level() : BelongsTo
+    {
         return $this->belongsTo(LevelModel::class, 'level_id', 'level_id');
     }
-    //JS 7 PRAKTIKUM 2
+
+    /**
+     * Accessor untuk atribut `image`
+     */
+    protected function image(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($image) => $image ? url('/storage/posts/' . $image) : null,
+        );
+    }
+
+
     /**
      * Mendapatkan nama role
      */
@@ -45,6 +63,7 @@ class UserModel extends Authenticatable implements JWTSubject
     {
         return $this->level->level_nama;
     }
+
     /**
      * Cek apakah user memiliki role tertentu
      */
@@ -53,11 +72,11 @@ class UserModel extends Authenticatable implements JWTSubject
         return $this->level->level_kode == $role;
     }
 
-    //JS 7 PRAKTIKUM 3
     /**
      * Mendapatkan kode role
      */
-    public function getRole() {
+    public function getRole()
+    {
         return $this->level->level_kode;
     }
 }
